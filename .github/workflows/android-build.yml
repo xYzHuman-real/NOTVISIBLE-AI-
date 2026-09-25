@@ -1,4 +1,5 @@
 name: NOTVISIBLEAI Android Release
+# Rebuild redesigned multi-screen app
 
 on:
   workflow_dispatch:
