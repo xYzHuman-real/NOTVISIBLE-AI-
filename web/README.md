@@ -1,6 +1,6 @@
 # NOTVISIBLEAI Web
 
-A static product site and API demo for NOTVISIBLEAI.
+A static product site plus a browser chat workspace for NOTVISIBLEAI.
 
 ## Local use
 
@@ -10,6 +10,8 @@ Serve this directory with any static HTTP server:
 python -m http.server 8080 --directory web
 ```
 
-The page runs in demo mode until an API URL is supplied. Set `window.API_BASE` before the page loads, or store `nv_api_base` and optionally `nv_api_key` in localStorage.
+Open `/chat.html` for the full browser workspace.
 
-Do not put a production API key into source-controlled files. Use a server-side proxy or secure runtime configuration for public deployments.
+The workspace supports local conversation history, chat switching, renaming, clearing history, API connection settings, and text-based file context. It sends OpenAI-style requests to the configured NOTVISIBLEAI API.
+
+Do not put a production API key into source-controlled files. The browser workspace stores a development key in local browser storage for convenience; production deployments should use a secure server-side authentication flow.
