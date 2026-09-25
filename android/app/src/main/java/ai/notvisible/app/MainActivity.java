@@ -88,12 +88,13 @@ public class MainActivity extends Activity {
         setContentView(root);
     }
     private LinearLayout buildTopBar(){
-        LinearLayout bar=row();bar.setBackgroundColor(Color.WHITE);pad(bar,16,8,12,6);
-        pageTitle=tv("NOTVISIBLEAI",21,INK,true);bar.addView(pageTitle,new LinearLayout.LayoutParams(0,-1,1));
-        TextView logo=tv("N",20,Color.WHITE,true);logo.setGravity(Gravity.CENTER);logo.setBackground(bg(INK,13));
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(40),dp(40));lp.setMargins(0,0,dp(8),0);bar.addView(logo,lp);
-        Button menu=btn("⋮",false);menu.setTextSize(22);menu.setContentDescription("More options");menu.setOnClickListener(v->showMenu());
-        bar.addView(menu,new LinearLayout.LayoutParams(dp(48),dp(48)));return bar;
+        LinearLayout bar=row();pad(bar,18,12,16,8);
+        pageTitle=tv(chatTitle(),20,Color.WHITE,true);
+        bar.addView(pageTitle,new LinearLayout.LayoutParams(0,-1,1));
+        TextView logo=tv("N",17,Color.rgb(8,14,26),true);logo.setGravity(Gravity.CENTER);logo.setBackground(bg(Color.WHITE,15));
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(42),dp(42));lp.setMargins(0,0,dp(7),0);bar.addView(logo,lp);
+        Button menu=btn("...",false);menu.setTextSize(12);menu.setOnClickListener(v->showMenu());
+        bar.addView(menu,new LinearLayout.LayoutParams(dp(48),dp(42)));return bar;
     }
     private LinearLayout buildBottomNav(){
         LinearLayout nav=row();nav.setBackgroundColor(Color.WHITE);pad(nav,8,7,8,8);
