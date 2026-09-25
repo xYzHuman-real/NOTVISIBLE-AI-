@@ -5,6 +5,7 @@ from collections import defaultdict, deque
 import httpx
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from provider import provider_chat
@@ -66,14 +67,24 @@ async def chat(req: ChatRequest, identity: str = Depends(authenticate)):
     rate_limit(identity)
     if req.model != MODEL_ID:
         raise HTTPException(404, f"Unknown model: {req.model}")
-    if req.stream:
-        raise HTTPException(501, "Streaming gateway is not enabled yet")
     payload = req.model_dump()
     try:
         if REMOTE_PROVIDER:
             return await provider_chat(payload)
         if not INFERENCE_URL:
             raise HTTPException(503, "No inference runner or remote provider is attached")
+        if req.stream:
+            async def proxy():
+                async with httpx.AsyncClient(timeout=None) as client:
+                    async with client.stream("POST", f"{INFERENCE_URL}/v1/chat/completions", json=payload) as response:
+                        if response.status_code >= 400:
+                            body = await response.aread()
+                            yield "data: " + body.decode("utf-8", errors="replace") + "\n\n"
+                            return
+                        async for line in response.aiter_lines():
+                            if line:
+                                yield line + "\n\n"
+            return StreamingResponse(proxy(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
         async with httpx.AsyncClient(timeout=120) as client:
             response = await client.post(f"{INFERENCE_URL}/v1/chat/completions", json=payload)
         response.raise_for_status()
