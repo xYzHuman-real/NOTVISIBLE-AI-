@@ -26,8 +26,8 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
     private static final int PICK_IMPORT=10, PICK_FILE=11, CREATE_EXPORT=12, REQ_AUDIO=13;
-    private final int INK=Color.rgb(17,24,39), MUTED=Color.rgb(100,116,139), BG=Color.rgb(248,250,252);
-    private final int BLUE=Color.rgb(37,99,235), BLUE_SOFT=Color.rgb(239,246,255), CARD=Color.WHITE, BORDER=Color.rgb(226,232,240);
+    private final int INK=Color.rgb(244,247,252), MUTED=Color.rgb(158,171,194), BG=Color.rgb(7,11,20);
+    private final int BLUE=Color.rgb(154,184,255), BLUE_SOFT=Color.rgb(32,46,76), CARD=Color.rgb(18,25,39), BORDER=Color.rgb(58,72,96);
     private LinearLayout root, content, bottom;
     private TextView pageTitle, status;
     private EditText input;
