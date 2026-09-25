@@ -3,12 +3,13 @@ import time
 from collections import defaultdict, deque
 
 import httpx
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from provider import provider_chat
+from file_tools import extract_text
 
 APP_NAME = "NOTVISIBLEAI API"
 API_VERSION = "0.1.0"
@@ -95,6 +96,19 @@ async def chat(req: ChatRequest, identity: str = Depends(authenticate)):
         raise HTTPException(502, f"Upstream returned HTTP {exc.response.status_code}")
     except (httpx.HTTPError, RuntimeError) as exc:
         raise HTTPException(502, f"Upstream unavailable: {exc}") from exc
+
+@app.post("/v1/files/extract")
+async def extract_file(file: UploadFile = File(...), _: str = Depends(authenticate)):
+    data = await file.read()
+    if len(data) > 10 * 1024 * 1024:
+        raise HTTPException(413, "File exceeds 10 MB limit")
+    try:
+        text = extract_text(file.filename or "upload", data)
+    except ValueError as exc:
+        raise HTTPException(415, str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(422, f"Unable to extract file: {exc}") from exc
+    return {"filename": file.filename, "characters": len(text), "text": text[:100000]}
 
 @app.get("/")
 def root():
