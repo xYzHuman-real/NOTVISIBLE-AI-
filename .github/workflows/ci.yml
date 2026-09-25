@@ -1,0 +1,44 @@
+name: NV-0.2 CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate JSON
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for p in Path(".").rglob("*.json"):
+              json.loads(p.read_text())
+              print("OK", p)
+          for p in Path("data").glob("*.jsonl"):
+              for i, line in enumerate(p.read_text().splitlines(), 1):
+                  if line.strip():
+                      json.loads(line)
+              print("OK", p)
+          PY
+      - name: Compile Python
+        run: python -m compileall -q src
+      - name: Validate dataset splits
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          expected = {"train.jsonl": 20, "validation.jsonl": 3, "test.jsonl": 5}
+          for name, count in expected.items():
+              rows = [json.loads(x) for x in Path("data", name).read_text().splitlines() if x.strip()]
+              assert len(rows) == count, f"{name}: expected {count}, got {len(rows)}"
+              assert all("messages" in r for r in rows), f"{name}: missing messages"
+          print("Dataset split validation passed.")
+          PY
