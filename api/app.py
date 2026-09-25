@@ -5,7 +5,8 @@ from typing import Any
 
 import httpx
 from fastapi import Depends, FastAPI, Header, HTTPException
-from pydantic import BaseModel, Field\nfrom fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from fastapi.middleware.cors import CORSMiddleware
 
 APP_NAME = "NOTVISIBLEAI API"
 API_VERSION = "0.1.0"
