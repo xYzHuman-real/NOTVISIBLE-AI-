@@ -27,3 +27,14 @@ Purpose: improve reliability and product usefulness.
 
 ## NV-1.0
 A release should only be considered after reproducible evaluation demonstrates that the model meets predefined quality criteria. No performance claims should be made without recorded measurements.
+
+
+## Assistant platform expansion
+- Persistent conversations and chat history
+- Streaming responses
+- File ingestion for common documents
+- Pluggable web search and citations
+- Multimodal provider adapters
+- Tool/function calling
+- Account and usage controls
+- Production observability and deployment automation
