@@ -15,7 +15,15 @@ MODEL_BACKEND = os.getenv("NV_MODEL_BACKEND", "transformers")
 API_KEY = os.getenv("NV_API_KEY", "")
 INFERENCE_URL = os.getenv("NV_INFERENCE_URL", "").rstrip("/")
 
-app = FastAPI(title=APP_NAME, version=API_VERSION)\nCORS_ORIGINS = [x.strip() for x in os.getenv("NV_CORS_ORIGINS", "*").split(",") if x.strip()]\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=CORS_ORIGINS,\n    allow_credentials=False,\n    allow_methods=["GET", "POST", "OPTIONS"],\n    allow_headers=["Authorization", "Content-Type"],\n)
+app = FastAPI(title=APP_NAME, version=API_VERSION)
+CORS_ORIGINS = [x.strip() for x in os.getenv("NV_CORS_ORIGINS", "*").split(",") if x.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
+)
 _windows: dict[str, deque[float]] = defaultdict(deque)
 RATE_LIMIT = int(os.getenv("NV_RATE_LIMIT", "60"))
 RATE_WINDOW = 60
