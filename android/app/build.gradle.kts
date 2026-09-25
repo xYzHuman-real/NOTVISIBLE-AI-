@@ -12,3 +12,8 @@ android {
     }
     buildTypes { release { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") } }
 }
+
+
+dependencies {
+    implementation("androidx.core:core-splashscreen:1.2.0")
+}
