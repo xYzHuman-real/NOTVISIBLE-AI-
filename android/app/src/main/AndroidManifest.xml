@@ -4,7 +4,7 @@
     <queries>
         <intent><action android:name="android.speech.RecognitionService" /></intent>
     </queries>
-    <application android:theme="@style/AppTheme" android:label="NOTVISIBLEAI" android:icon="@drawable/ic_launcher" android:allowBackup="false" android:supportsRtl="true">
+    <application android:theme="@style/SplashTheme" android:label="NOTVISIBLEAI" android:icon="@drawable/ic_launcher" android:allowBackup="false" android:supportsRtl="true">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
