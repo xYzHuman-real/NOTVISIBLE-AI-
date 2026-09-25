@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
     private GradientDrawable premiumBackground(){
         GradientDrawable g=new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.rgb(8,15,30),Color.rgb(19,32,58),Color.rgb(34,48,78)});
+                new int[]{Color.rgb(5,9,18),Color.rgb(13,22,39),Color.rgb(27,38,65),Color.rgb(10,17,31)});
         return g;
     }
 
