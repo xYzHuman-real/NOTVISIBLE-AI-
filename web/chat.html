@@ -19,7 +19,7 @@
 <div class="toolbar">
 <button id="newChat" class="button ghost" type="button">New chat</button>
 <button id="renameChat" class="button ghost" type="button">Rename</button>
-<button id="clearChats" class="button ghost" type="button">Clear history</button><button id="exportChats" class="button ghost" type="button">Export</button><label class="button ghost" for="importInput">Import<input id="importInput" type="file" accept=".json" hidden></label>
+<button id="clearChats" class="button ghost" type="button">Clear history</button><button id="exportChats" class="button ghost" type="button">Export</button><label class="button ghost" for="importInput">Import<input id="importInput" type="file" accept=".json" hidden></label><button id="exportChats" class="button ghost" type="button">Export</button><label class="button ghost" for="importInput">Import<input id="importInput" type="file" accept=".json" hidden></label>
 </div>
 <div id="history" class="history"></div>
 <div class="status"><span id="dot"></span><span id="status">Checking API…</span></div>
@@ -30,7 +30,7 @@
 <form id="chatForm">
 <label class="file-button" title="Attach text file">＋<input id="fileInput" type="file" accept=".txt,.md,.json,.csv,.py,.js,.ts,.html,.css" hidden></label>
 <input id="prompt" autocomplete="off" placeholder="Message NV-0.2…" required>
-<button class="button" type="submit">Send</button>
+<button id="copyLast" class="button ghost" type="button">Copy last</button><button class="button" type="submit">Send</button>
 </form>
 <div id="attachment" class="attachment"></div>
 </div>
