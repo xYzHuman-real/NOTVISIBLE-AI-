@@ -29,7 +29,7 @@ jobs:
               print("OK", p)
           PY
       - name: Compile Python
-        run: python -m compileall -q src
+        run: python -m compileall -q src inference api sdk/python
       - name: Validate dataset splits
         run: |
           python - <<'PY'
