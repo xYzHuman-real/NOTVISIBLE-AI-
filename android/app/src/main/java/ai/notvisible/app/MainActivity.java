@@ -81,10 +81,10 @@ public class MainActivity extends Activity {
     @Override protected void onDestroy(){if(speech!=null)speech.destroy();super.onDestroy();}
 
     private void buildShell(){
-        root=col();root.setBackgroundColor(BG);
-        root.addView(buildTopBar(),new LinearLayout.LayoutParams(-1,dp(68)));
+        root=col();root.setBackground(premiumBackground());
+        root.addView(buildTopBar(),new LinearLayout.LayoutParams(-1,dp(72)));
         content=col();root.addView(content,new LinearLayout.LayoutParams(-1,0,1));
-        bottom=buildBottomNav();root.addView(bottom,new LinearLayout.LayoutParams(-1,dp(76)));
+        bottom=buildBottomNav();root.addView(bottom,new LinearLayout.LayoutParams(-1,dp(82)));
         setContentView(root);
     }
     private LinearLayout buildTopBar(){
