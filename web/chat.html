@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOTVISIBLEAI — Chat</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="nav"><a class="brand" href="index.html">NOTVISIBLE<span>AI</span></a><nav><a href="index.html#product">Product</a><a href="chat.html">Chat</a><a href="index.html#developers">Developers</a></nav><a class="button small" href="index.html">Home</a></header>
+<main>
+<section class="section demo">
+<div>
+<div class="eyebrow">CHAT WORKSPACE</div><h1>Talk to NV-0.2.</h1>
+<p>Chat history is stored locally in this browser. Connect your own NOTVISIBLEAI API, switch conversations, rename chats, and attach text-based files as context.</p>
+<div class="settings">
+<input id="apiBase" placeholder="API base, e.g. http://localhost:8000">
+<input id="apiKey" type="password" placeholder="API key (optional)">
+<button id="saveSettings" class="button ghost" type="button">Save connection</button>
+</div>
+<div class="toolbar">
+<button id="newChat" class="button ghost" type="button">New chat</button>
+<button id="renameChat" class="button ghost" type="button">Rename</button>
+<button id="clearChats" class="button ghost" type="button">Clear history</button>
+</div>
+<div id="history" class="history"></div>
+<div class="status"><span id="dot"></span><span id="status">Checking API…</span></div>
+</div>
+<div class="chat">
+<div id="chatTitle" class="chat-title">New conversation</div>
+<div id="messages" class="messages"></div>
+<form id="chatForm">
+<label class="file-button" title="Attach text file">＋<input id="fileInput" type="file" accept=".txt,.md,.json,.csv,.py,.js,.ts,.html,.css" hidden></label>
+<input id="prompt" autocomplete="off" placeholder="Message NV-0.2…" required>
+<button class="button" type="submit">Send</button>
+</form>
+<div id="attachment" class="attachment"></div>
+</div>
+</section>
+</main>
+<footer><span>© NOTVISIBLEAI</span><span>NV-0.2 chat workspace</span></footer>
+<script src="chat.js"></script>
+</body>
+</html>
