@@ -1,0 +1,39 @@
+name: NV-0.2 Training
+
+on:
+  push:
+    paths:
+      - "src/train_nv02.py"
+      - "src/evaluate_nv02.py"
+      - "data/**"
+      - "configs/**"
+      - ".github/workflows/train-cpu.yml"
+  workflow_dispatch:
+
+jobs:
+  train-and-evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install training stack
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch transformers datasets accelerate "trl[peft]"
+      - name: Train NV-0.2 adapter
+        env:
+          NV_ALLOW_CPU: "1"
+        run: python src/train_nv02.py
+      - name: Evaluate NV-0.2 adapter
+        run: python src/evaluate_nv02.py
+      - name: Upload trained adapter and evaluation
+        uses: actions/upload-artifact@v4
+        with:
+          name: nv-0.2-training-output
+          path: |
+            artifacts/nv-0.2-lora/
+            reports/nv-0.2-evaluation.md
+          if-no-files-found: error
