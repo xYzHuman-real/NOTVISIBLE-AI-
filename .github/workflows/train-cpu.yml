@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: repo
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -26,14 +28,16 @@ jobs:
       - name: Train NV-0.2 adapter
         env:
           NV_ALLOW_CPU: "1"
+        working-directory: repo
         run: python src/train_nv02.py
       - name: Evaluate NV-0.2 adapter
+        working-directory: repo
         run: python src/evaluate_nv02.py
       - name: Upload trained adapter and evaluation
         uses: actions/upload-artifact@v4
         with:
           name: nv-0.2-training-output
           path: |
-            artifacts/nv-0.2-lora/
-            reports/nv-0.2-evaluation.md
+            repo/artifacts/nv-0.2-lora/
+            repo/reports/nv-0.2-evaluation.md
           if-no-files-found: error
