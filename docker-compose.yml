@@ -18,7 +18,10 @@ services:
       dockerfile: api/Dockerfile
     environment:
       NV_API_KEY: ${NV_API_KEY:?Set NV_API_KEY before starting}
-      NV_INFERENCE_URL: http://inference:8100
+      NV_INFERENCE_URL: ${NV_INFERENCE_URL:-http://inference:8100}
+      NV_PROVIDER_URL: ${NV_PROVIDER_URL:-}
+      NV_PROVIDER_KEY: ${NV_PROVIDER_KEY:-}
+      NV_PROVIDER_MODEL: ${NV_PROVIDER_MODEL:-}
       NV_RATE_LIMIT: ${NV_RATE_LIMIT:-60}
       NV_CORS_ORIGINS: ${NV_CORS_ORIGINS:-*}
     depends_on:
