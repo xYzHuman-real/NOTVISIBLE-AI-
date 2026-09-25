@@ -348,10 +348,10 @@ public class MainActivity extends Activity {
         LinearLayout composer=buildComposer();content.addView(composer,new LinearLayout.LayoutParams(-1,dp(84)));
     }
     private LinearLayout heroChat(){
-        LinearLayout h=col();h.setGravity(Gravity.CENTER);pad(h,18,28,18,22);h.setBackground(outline(Color.WHITE,BORDER,24));
-        TextView n=tv("N",30,Color.WHITE,true);n.setGravity(Gravity.CENTER);n.setBackground(bg(INK,18));h.addView(n,new LinearLayout.LayoutParams(dp(62),dp(62)));
-        addGap(h,12);TextView t=tv("How can I help?",23,INK,true);t.setGravity(Gravity.CENTER);h.addView(t,new LinearLayout.LayoutParams(-1,dp(36)));
-        TextView s=tv("Ask a question, attach a file, or use your voice.",14,MUTED,false);s.setGravity(Gravity.CENTER);h.addView(s,new LinearLayout.LayoutParams(-1,dp(34)));return h;
+        LinearLayout h=col();h.setGravity(Gravity.CENTER);pad(h,18,28,18,22);h.setBackground(glass(23,48,30));
+        TextView n=tv("N",25,Color.rgb(8,14,26),true);n.setGravity(Gravity.CENTER);n.setBackground(bg(Color.WHITE,18));h.addView(n,new LinearLayout.LayoutParams(dp(62),dp(62)));
+        addGap(h,12);TextView t=tv("What are we\nthinking about?",30,Color.WHITE,true);t.setGravity(Gravity.CENTER);h.addView(t,new LinearLayout.LayoutParams(-1,dp(36)));
+        TextView s=tv("Ask anything. Bring a document. Use your voice.",14,Color.WHITE,false);s.setAlpha(.68f);s.setGravity(Gravity.CENTER);h.addView(s,new LinearLayout.LayoutParams(-1,dp(34)));return h;
     }
     private LinearLayout messageCard(String role,String text){
         boolean user=role.equals("user");LinearLayout c=col();pad(c,14,12,14,12);c.setBackground(bg(user?INK:Color.WHITE,18));
