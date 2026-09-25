@@ -5,7 +5,7 @@ from typing import Any
 
 import httpx
 from fastapi import Depends, FastAPI, Header, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field\nfrom fastapi.middleware.cors import CORSMiddleware
 
 APP_NAME = "NOTVISIBLEAI API"
 API_VERSION = "0.1.0"
@@ -14,7 +14,7 @@ MODEL_BACKEND = os.getenv("NV_MODEL_BACKEND", "transformers")
 API_KEY = os.getenv("NV_API_KEY", "")
 INFERENCE_URL = os.getenv("NV_INFERENCE_URL", "").rstrip("/")
 
-app = FastAPI(title=APP_NAME, version=API_VERSION)
+app = FastAPI(title=APP_NAME, version=API_VERSION)\nCORS_ORIGINS = [x.strip() for x in os.getenv("NV_CORS_ORIGINS", "*").split(",") if x.strip()]\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=CORS_ORIGINS,\n    allow_credentials=False,\n    allow_methods=["GET", "POST", "OPTIONS"],\n    allow_headers=["Authorization", "Content-Type"],\n)
 _windows: dict[str, deque[float]] = defaultdict(deque)
 RATE_LIMIT = int(os.getenv("NV_RATE_LIMIT", "60"))
 RATE_WINDOW = 60
