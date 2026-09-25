@@ -2,6 +2,10 @@ name: NOTVISIBLEAI Android Play Bundle
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "android/**"
+      - ".github/workflows/android-play-bundle.yml"
 
 jobs:
   bundle:
