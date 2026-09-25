@@ -50,6 +50,7 @@ args = SFTConfig(
     save_steps=10,
     save_total_limit=2,
     report_to="none",
+    use_cpu=not torch.cuda.is_available(),
     max_length=512,
     packing=True,
 )
