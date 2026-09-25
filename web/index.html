@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="NOTVISIBLEAI — developer-first AI infrastructure and models.">
+  <title>NOTVISIBLEAI — AI infrastructure</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="#">NOTVISIBLE<span>AI</span></a>
+  <nav><a href="#product">Product</a><a href="#developers">Developers</a><a href="#model">NV-0.2</a><a href="#demo">Demo</a></nav>
+  <a class="button small" href="#developers">Build with us</a>
+</header>
+
+<main>
+<section class="hero">
+  <div class="eyebrow">NOTVISIBLEAI · MODEL PLATFORM</div>
+  <h1>AI infrastructure built to be <em>useful.</em></h1>
+  <p class="hero-copy">A compact model stack with an OpenAI-compatible API, self-hosted inference, SDKs and reproducible training workflows.</p>
+  <div class="actions"><a class="button" href="#demo">Try the model</a><a class="button ghost" href="#developers">Read the API</a></div>
+  <div class="status"><span id="dot"></span><span id="status">Checking API…</span></div>
+</section>
+
+<section id="product" class="grid">
+  <article><b>Model layer</b><p>NV-0.2 is a fine-tuned LoRA adapter on Qwen2.5-0.5B-Instruct.</p></article>
+  <article><b>API layer</b><p>FastAPI gateway with bearer authentication, rate limiting and OpenAI-style chat completions.</p></article>
+  <article><b>Deployment layer</b><p>Containerized inference runner for self-hosted deployment and controlled infrastructure.</p></article>
+</section>
+
+<section id="model" class="section">
+  <div class="eyebrow">NV-0.2</div><h2>A real, reproducible model release.</h2>
+  <div class="facts"><div><strong>0.5B</strong><span>base parameters</span></div><div><strong>SFT</strong><span>training method</span></div><div><strong>LoRA</strong><span>adapter architecture</span></div><div><strong>5</strong><span>held-out smoke tests</span></div></div>
+  <p class="note">The current release is a research/prototype adapter, not a newly pretrained foundation model and not a broad capability benchmark.</p>
+</section>
+
+<section id="demo" class="demo section">
+  <div><div class="eyebrow">LIVE API DEMO</div><h2>Talk to NV-0.2.</h2><p>Set <code>API_BASE</code> in this page or run the API locally. Authentication is required when the gateway is configured with <code>NV_API_KEY</code>.</p></div>
+  <div class="chat"><div id="messages" class="messages"><div class="msg bot">Hello — I’m NV-0.2. Ask me something.</div></div><form id="chatForm"><input id="prompt" autocomplete="off" placeholder="Message NV-0.2…" required><button class="button" type="submit">Send</button></form></div>
+</section>
+
+<section id="developers" class="section developers">
+  <div class="eyebrow">FOR DEVELOPERS</div><h2>One stack. Multiple ways to build.</h2>
+  <div class="dev-grid"><div><h3>REST</h3><p><code>POST /v1/chat/completions</code></p></div><div><h3>Python</h3><p>Use the included SDK for typed API calls.</p></div><div><h3>JavaScript</h3><p>Use the included ESM SDK in Node.js.</p></div><div><h3>Self-host</h3><p>Run the inference container with your verified adapter artifact.</p></div></div>
+</section>
+</main>
+
+<footer><span>© NOTVISIBLEAI</span><span>Research · Infrastructure · Models</span></footer>
+<script>
+const API_BASE = window.API_BASE || localStorage.getItem("nv_api_base") || "";
+const apiKey = localStorage.getItem("nv_api_key") || "";
+const statusEl=document.getElementById("status"), dot=document.getElementById("dot");
+async function health(){
+  if(!API_BASE){statusEl.textContent="Demo mode · connect an API to chat";return}
+  try{const r=await fetch(API_BASE+"/health");if(!r.ok)throw 0;const d=await r.json();statusEl.textContent=d.inference_attached?"API online · inference attached":"API online · inference not attached";dot.classList.add("on")}catch(e){statusEl.textContent="API unavailable";dot.classList.add("off")}
+}
+health();
+document.getElementById("chatForm").addEventListener("submit",async e=>{
+ e.preventDefault();const input=document.getElementById("prompt"), text=input.value.trim();if(!text)return;
+ const box=document.getElementById("messages");box.insertAdjacentHTML("beforeend",'<div class="msg user"></div>');box.lastElementChild.textContent=text;input.value="";
+ if(!API_BASE){box.insertAdjacentHTML("beforeend",'<div class="msg bot">Connect this page to a running NOTVISIBLEAI API by setting <code>API_BASE</code>.</div>');return}
+ try{const r=await fetch(API_BASE+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",...(apiKey?{"Authorization":"Bearer "+apiKey}:{})},body:JSON.stringify({model:"nv-0.2",messages:[{role:"user",content:text}],temperature:.7,max_tokens:256})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Request failed");box.insertAdjacentHTML("beforeend",'<div class="msg bot"></div>');box.lastElementChild.textContent=d.choices?.[0]?.message?.content||"No response";box.scrollTop=box.scrollHeight}catch(err){box.insertAdjacentHTML("beforeend",'<div class="msg bot error"></div>');box.lastElementChild.textContent=err.message}
+});
+</script>
+</body>
+</html>
