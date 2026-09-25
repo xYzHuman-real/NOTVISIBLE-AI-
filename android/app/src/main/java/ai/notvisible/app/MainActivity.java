@@ -303,7 +303,7 @@ public class MainActivity extends Activity {
             return hex(f.generateSecret(spec).getEncoded());
         }catch(Exception e){return "";}
     }
-    private String hex(byte[] b){StringBuilder s=new StringBuilder();for(byte x:b)s.append(String.format(Locale.US,"%02x",x));return s.toString();}
+    private String hex(byte[] b){StringBuilder s=new StringBuilder();for(byte x:b)s.append(String.format(Locale.US,"%02x",x & 0xff));return s.toString();}
     private byte[] fromHex(String s){byte[] b=new byte[s.length()/2];for(int i=0;i<b.length;i++)b[i]=(byte)Integer.parseInt(s.substring(i*2,i*2+2),16);return b;}
 
     private void showWelcome(){
