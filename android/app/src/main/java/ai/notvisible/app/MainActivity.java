@@ -47,9 +47,10 @@ public class MainActivity extends Activity {
     private GradientDrawable bg(int color,int radius){GradientDrawable g=new GradientDrawable();g.setColor(color);g.setCornerRadius(dp(radius));return g;}
     private GradientDrawable outline(int color,int stroke,int radius){GradientDrawable g=bg(color,radius);g.setStroke(dp(1),stroke);return g;}
     private Button btn(String text,boolean primary){
-        Button b=new Button(this); b.setText(text); b.setTextSize(14); b.setAllCaps(false); b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
-        b.setTextColor(primary?Color.WHITE:INK); b.setGravity(Gravity.CENTER); b.setPadding(dp(10),0,dp(10),0);
-        b.setBackground(bg(primary?INK:Color.WHITE,16)); if(!primary)b.setBackground(outline(Color.WHITE,BORDER,16));
+        Button b=new Button(this);b.setText(text);b.setTextSize(14);b.setAllCaps(false);
+        b.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));
+        b.setTextColor(primary?Color.rgb(8,14,26):INK);b.setGravity(Gravity.CENTER);b.setPadding(dp(10),0,dp(10),0);
+        b.setBackground(primary?bg(Color.WHITE,18):glass(18,42,18));b.setStateListAnimator(null);
         return b;
     }
     private LinearLayout col(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);return l;}
