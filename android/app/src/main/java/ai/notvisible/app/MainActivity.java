@@ -323,6 +323,22 @@ public class MainActivity extends Activity {
     }
     private void statusToast(String s){if(status!=null)status.setText(s);Toast.makeText(this,s,Toast.LENGTH_SHORT).show();}
 
+    private String validTemp(String raw){
+        try{
+            double v=Double.parseDouble(raw.trim());
+            if(Double.isNaN(v)||Double.isInfinite(v)) return "0.7";
+            v=Math.max(0.0,Math.min(2.0,v));
+            return String.valueOf(v);
+        }catch(Exception e){return "0.7";}
+    }
+    private String validMax(String raw){
+        try{
+            int v=Integer.parseInt(raw.trim());
+            v=Math.max(64,Math.min(32768,v));
+            return String.valueOf(v);
+        }catch(Exception e){return "1024";}
+    }
+
     @Override public void onBackPressed(){
         if(screen.equals("settings")||screen.equals("files")||screen.equals("about")||screen.equals("transfer")||screen.equals("error")){showScreen("chat");return;}
         super.onBackPressed();
