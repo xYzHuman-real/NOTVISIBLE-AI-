@@ -4,6 +4,10 @@ base.value=localStorage.getItem("nv_api_base")||"";
 key.value=localStorage.getItem("nv_api_key")||"";
 const state=JSON.parse(localStorage.getItem(KEY)||"null")||{active:null,chats:[]};
 const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+function download(name,text,type="application/json"){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportChats(){download("notvisibleai-chats.json",JSON.stringify(state,null,2))}
+function importChats(file){const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.chats))throw new Error("Invalid chat export");state.chats=x.chats;state.active=x.active||state.chats[0]?.id||null;save();render()}catch(e){alert(e.message)}};r.readAsText(file)}
+
 const current=()=>state.chats.find(x=>x.id===state.active);
 function newChat(){const c={id:crypto.randomUUID(),title:"New conversation",messages:[]};state.chats.unshift(c);state.active=c.id;save();render()}
 function ensure(){if(!current())newChat()}
@@ -13,6 +17,7 @@ async function health(){const s=document.getElementById("status"),d=document.get
 document.getElementById("saveSettings").onclick=()=>{localStorage.setItem("nv_api_base",base.value.trim());localStorage.setItem("nv_api_key",key.value);health()};
 document.getElementById("newChat").onclick=newChat;
 document.getElementById("renameChat").onclick=()=>{const c=current(),n=prompt("Conversation name:",c.title);if(n&&n.trim()){c.title=n.trim();save();render()}};
+document.getElementById("exportChats").onclick=exportChats;document.getElementById("importInput").onchange=e=>{if(e.target.files[0])importChats(e.target.files[0])};
 document.getElementById("clearChats").onclick=()=>{if(confirm("Clear all local chat history?")){state.chats=[];state.active=null;save();render()}};
 document.getElementById("fileInput").onchange=async e=>{const f=e.target.files[0];if(!f)return;if(!/\.(txt|md|json|csv|py|js|ts|html|css)$/i.test(f.name)){alert("Text-based files only.");return}const t=await f.text();window.nvAttachment={name:f.name,text:t.slice(0,20000)};document.getElementById("attachment").textContent=f.name+" attached ("+t.length+" characters)"};
 document.getElementById("chatForm").onsubmit=async e=>{e.preventDefault();ensure();const input=document.getElementById("prompt"),text=input.value.trim();if(!text)return;const c=current();let content=text;if(window.nvAttachment)content+="\n\n[Attached file: "+window.nvAttachment.name+"]\n"+window.nvAttachment.text;c.messages.push({role:"user",content});input.value="";window.nvAttachment=null;document.getElementById("attachment").textContent="";if(c.title==="New conversation")c.title=text.slice(0,42);save();render();if(!api()){c.messages.push({role:"assistant",content:"Connect a running NOTVISIBLEAI API using the connection settings to receive a model response."});save();render();return}try{const r=await fetch(api()+"/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",...(key.value?{Authorization:"Bearer "+key.value}:{})},body:JSON.stringify({model:"nv-0.2",messages:c.messages,temperature:.7,max_tokens:256})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Request failed");c.messages.push({role:"assistant",content:d.choices?.[0]?.message?.content||"No response"});save();render()}catch(err){c.messages.push({role:"assistant",content:"Request error: "+err.message});save();render()}};
