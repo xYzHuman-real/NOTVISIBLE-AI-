@@ -1,0 +1,37 @@
+services:
+  inference:
+    build:
+      context: .
+      dockerfile: inference/Dockerfile
+    environment:
+      NV_BASE_MODEL: Qwen/Qwen2.5-0.5B-Instruct
+      NV_ADAPTER_PATH: /models/final
+    volumes:
+      - ./artifacts/nv-0.2-lora/final:/models/final:ro
+    ports:
+      - "8100:8100"
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      NV_API_KEY: ${NV_API_KEY:?Set NV_API_KEY before starting}
+      NV_INFERENCE_URL: http://inference:8100
+      NV_RATE_LIMIT: ${NV_RATE_LIMIT:-60}
+      NV_CORS_ORIGINS: ${NV_CORS_ORIGINS:-*}
+    depends_on:
+      - inference
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    restart: unless-stopped
