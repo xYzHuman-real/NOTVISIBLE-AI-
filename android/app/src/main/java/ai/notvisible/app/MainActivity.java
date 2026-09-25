@@ -421,7 +421,7 @@ public class MainActivity extends Activity {
     }
     private TextView sectionTitle(String s){TextView t=tv(s.toUpperCase(Locale.US),12,BLUE,true);return t;}
     private LinearLayout fieldCard(String title,String desc,EditText field){
-        LinearLayout c=col();c.setBackground(outline(Color.WHITE,BORDER,18));pad(c,14,10,14,10);c.addView(tv(title,14,INK,true));c.addView(tv(desc,12,MUTED,false));addGap(c,3);field.setTextSize(14);field.setSingleLine(false);field.setBackground(outline(Color.WHITE,BORDER,12));field.setPadding(dp(12),dp(4),dp(12),dp(4));c.addView(field,new LinearLayout.LayoutParams(-1,dp(50)));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,0,0,dp(10));return wrap(c,p);
+        LinearLayout c=col();c.setBackground(glass(18,32,18));pad(c,14,10,14,10);c.addView(tv(title,14,INK,true));c.addView(tv(desc,12,MUTED,false));addGap(c,3);field.setTextSize(14);field.setSingleLine(false);field.setBackground(glass(12,24,12));field.setPadding(dp(12),dp(4),dp(12),dp(4));c.addView(field,new LinearLayout.LayoutParams(-1,dp(50)));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,0,0,dp(10));return wrap(c,p);
     }
     private EditText field(String hint,String value){EditText e=new EditText(this);e.setHint(hint);e.setText(value);e.setTextColor(INK);return e;}
 
