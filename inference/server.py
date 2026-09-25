@@ -3,6 +3,9 @@ from typing import Any
 
 import torch
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
+from transformers import TextIteratorStreamer
+from threading import Thread
 from pydantic import BaseModel, Field
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
@@ -52,13 +55,24 @@ def models():
 def chat(req: ChatRequest):
     if req.model != MODEL_ID:
         raise HTTPException(404, f"Unknown model: {req.model}")
-    if req.stream:
-        raise HTTPException(501, "Streaming is not enabled in this runner")
     messages = [m.model_dump() for m in req.messages]
     prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     inputs = tokenizer(
         prompt, return_tensors="pt", truncation=True, max_length=MAX_INPUT_TOKENS
     )
+    if req.stream:
+        streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+        kwargs = dict(**inputs, max_new_tokens=req.max_tokens, do_sample=req.temperature > 0, temperature=max(req.temperature, 1e-5), pad_token_id=tokenizer.eos_token_id, streamer=streamer)
+        Thread(target=model.generate, kwargs=kwargs).start()
+        import json
+        completion_id = "chatcmpl-" + uuid.uuid4().hex[:16]
+        created = int(time.time())
+        def events():
+            for token in streamer:
+                if token:
+                    yield "data: " + json.dumps({"id":completion_id,"object":"chat.completion.chunk","created":created,"model":MODEL_ID,"choices":[{"index":0,"delta":{"content":token},"finish_reason":None}]}) + "\n\n"
+            yield "data: " + json.dumps({"id":completion_id,"object":"chat.completion.chunk","created":created,"model":MODEL_ID,"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}) + "\n\ndata: [DONE]\n\n"
+        return StreamingResponse(events(), media_type="text/event-stream", headers={"Cache-Control":"no-cache","X-Accel-Buffering":"no"})
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
