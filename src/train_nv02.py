@@ -40,11 +40,11 @@ peft_config = LoraConfig(
 
 args = SFTConfig(
     output_dir=str(OUT),
-    num_train_epochs=2,
+    num_train_epochs=1,
     per_device_train_batch_size=1,
-    gradient_accumulation_steps=8,
+    gradient_accumulation_steps=2,
     learning_rate=1e-4,
-    logging_steps=1,
+    logging_steps=1,\n    max_steps=int(os.environ.get("NV_MAX_STEPS", "10")),
     eval_strategy="steps",
     eval_steps=10,
     save_steps=10,
