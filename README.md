@@ -37,3 +37,16 @@ The evaluator records deterministic generations for the held-out test set and co
 ## Versioning
 - NV-0.1: initial SFT/LoRA scaffold
 - NV-0.2: expanded dataset schema, explicit splits, robust trainer, deterministic evaluator, run manifest
+
+
+## Product stack
+
+NOTVISIBLEAI now includes a static product site in `web/`, a Docker Compose local stack, a FastAPI gateway, a self-hosted inference runner, Python and JavaScript SDKs, reproducible model training/evaluation, and product/security documentation.
+
+### Full-stack quickstart
+
+See [docs/QUICKSTART.md](docs/QUICKSTART.md). The verified NV-0.2 Actions artifact must be downloaded separately because model artifacts are not committed to source control.
+
+### Web product
+
+Serve `web/` directly for the public product interface. Configure its API endpoint at runtime; never place a production API key in source-controlled JavaScript.
