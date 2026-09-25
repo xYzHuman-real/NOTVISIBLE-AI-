@@ -97,11 +97,12 @@ public class MainActivity extends Activity {
         bar.addView(menu,new LinearLayout.LayoutParams(dp(48),dp(42)));return bar;
     }
     private LinearLayout buildBottomNav(){
-        LinearLayout nav=row();nav.setBackgroundColor(Color.WHITE);pad(nav,8,7,8,8);
-        String[] names={"⌂\nChats","▣\nFiles","⚙\nSettings"};String[] ids={"chat","files","settings"};
-        for(int i=0;i<3;i++){final String id=ids[i];Button b=btn(names[i],false);b.setTextSize(12);b.setContentDescription(names[i].replace("\n"," "));b.setOnClickListener(v->showScreen(id));
-            nav.addView(b,new LinearLayout.LayoutParams(0,dp(58),1));}
-        return nav;
+        LinearLayout outer=row();pad(outer,14,7,14,9);
+        LinearLayout nav=row();nav.setBackground(glass(20,35,24));pad(nav,5,5,5,5);
+        String[] names={"Chats","Files","Settings"};String[] ids={"chat","files","settings"};
+        for(int i=0;i<3;i++){final String id=ids[i];Button b=btn(names[i],false);b.setTextSize(12);b.setOnClickListener(v->showScreen(id));
+            nav.addView(b,new LinearLayout.LayoutParams(0,dp(54),1));}
+        outer.addView(nav,new LinearLayout.LayoutParams(-1,dp(64)));return outer;
     }
     private void showScreen(String id){
         screen=id;content.removeAllViews();bottom.setVisibility(id.equals("welcome")?View.GONE:View.VISIBLE);
