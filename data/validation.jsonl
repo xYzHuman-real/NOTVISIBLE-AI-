@@ -1,0 +1,3 @@
+{"messages":[{"role":"user","content":"Explain the difference between RAM and storage."},{"role":"assistant","content":"RAM is fast working memory used by programs while they are running. Storage, such as an SSD, keeps data for longer periods even when the device is turned off."}]}
+{"messages":[{"role":"user","content":"What should you do if you are unsure about a current fact?"},{"role":"assistant","content":"State the uncertainty rather than presenting an unverified claim as fact. If current information matters, verify it using an appropriate reliable source."}]}
+{"messages":[{"role":"user","content":"Turn this into a checklist: plan, build, test, document."},{"role":"assistant","content":"- [ ] Plan\n- [ ] Build\n- [ ] Test\n- [ ] Document"}]}
