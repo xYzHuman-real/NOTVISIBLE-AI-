@@ -1,4 +1,9 @@
 <resources>
+<style name="SplashTheme" parent="Theme.SplashScreen">
+<item name="windowSplashScreenBackground">#080F1E</item>
+<item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher</item>
+<item name="postSplashScreenTheme">@style/AppTheme</item>
+</style>
 <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
 <item name="android:fontFamily">sans</item><item name="android:colorAccent">#111111</item><item name="android:navigationBarColor">#FFFFFF</item><item name="android:statusBarColor">#FFFFFF</item><item name="android:windowLightStatusBar">true</item>
 </style>
