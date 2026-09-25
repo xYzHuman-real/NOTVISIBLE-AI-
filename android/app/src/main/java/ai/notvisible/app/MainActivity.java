@@ -13,7 +13,10 @@ import android.speech.*;
 import android.text.InputType;
 import android.view.*;
 import android.widget.*;
+import androidx.core.splashscreen.SplashScreen;
 import org.json.*;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 
 import java.io.*;
 import java.net.*;
@@ -56,11 +59,24 @@ public class MainActivity extends Activity {
     private void addGap(LinearLayout p,int h){Space s=new Space(this);p.addView(s,new LinearLayout.LayoutParams(1,dp(h)));}
 
     @Override public void onCreate(Bundle b){
-        super.onCreate(b); getWindow().setStatusBarColor(Color.WHITE);getWindow().setNavigationBarColor(Color.WHITE);
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        prefs=getSharedPreferences("nv",MODE_PRIVATE);loadHistory(); buildShell();
+        SplashScreen.installSplashScreen(this);
+        super.onCreate(b);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        prefs=getSharedPreferences("nv",MODE_PRIVATE);
+        loadHistory();
         if(speechAvailable())setupSpeech();
-        if(!prefs.getBoolean("onboarded",false))showWelcome(); else showScreen("chat");
+
+        // One-time migration into the new premium first-run experience.
+        if(!prefs.getBoolean("premium_flow_v1",false)){
+            prefs.edit().remove("onboarded").remove("auth").putBoolean("premium_flow_v1",true).apply();
+            showOnboarding(0);
+        } else if(!prefs.getBoolean("auth",false)){
+            showAuth(false);
+        } else {
+            enterApp();
+        }
     }
     @Override protected void onDestroy(){if(speech!=null)speech.destroy();super.onDestroy();}
 
@@ -91,6 +107,204 @@ public class MainActivity extends Activity {
         pageTitle.setText(id.equals("chat")?chatTitle():id.equals("files")?"Files":id.equals("settings")?"Settings":id.equals("about")?"About NOTVISIBLEAI":id.equals("transfer")?"Import / Export":"NOTVISIBLEAI");
         if(id.equals("chat"))renderChat(); else if(id.equals("files"))renderFiles(); else if(id.equals("settings"))renderSettings(); else if(id.equals("about"))renderAbout(); else if(id.equals("transfer"))renderTransfer(); else if(id.equals("error"))renderError();
     }
+
+    private void enterApp(){
+        getWindow().setStatusBarColor(Color.WHITE);
+        getWindow().setNavigationBarColor(Color.WHITE);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        buildShell();
+        showScreen("chat");
+    }
+
+    private GradientDrawable premiumBackground(){
+        GradientDrawable g=new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.rgb(8,15,30),Color.rgb(19,32,58),Color.rgb(34,48,78)});
+        return g;
+    }
+
+    private GradientDrawable glass(int fillAlpha,int strokeAlpha,int radius){
+        GradientDrawable g=new GradientDrawable();
+        g.setColor(Color.argb(fillAlpha,255,255,255));
+        g.setCornerRadius(dp(radius));
+        g.setStroke(dp(1),Color.argb(strokeAlpha,255,255,255));
+        return g;
+    }
+
+    private TextView whiteText(String text,float size,boolean bold){
+        return tv(text,size,Color.WHITE,bold);
+    }
+
+    private LinearLayout premiumPage(){
+        LinearLayout page=col();
+        page.setBackground(premiumBackground());
+        pad(page,22,24,22,24);
+        return page;
+    }
+
+    private TextView brandMark(){
+        TextView n=tv("N",30,Color.rgb(8,15,30),true);
+        n.setGravity(Gravity.CENTER);
+        n.setBackground(bg(Color.WHITE,20));
+        return n;
+    }
+
+    private void showOnboarding(int pageIndex){
+        LinearLayout page=premiumPage();
+        page.setGravity(Gravity.CENTER_HORIZONTAL);
+        TextView top=whiteText("NOTVISIBLEAI",16,true);
+        top.setGravity(Gravity.CENTER);
+        page.addView(top,new LinearLayout.LayoutParams(-1,dp(40)));
+
+        LinearLayout.LayoutParams markLp=new LinearLayout.LayoutParams(dp(78),dp(78));
+        markLp.gravity=Gravity.CENTER_HORIZONTAL;
+        TextView mark=brandMark();
+        markLp.setMargins(0,dp(38),0,dp(28));
+        page.addView(mark,markLp);
+
+        String[] titles={"Intelligence, without the clutter.","Your private AI workspace.","Built around your flow."};
+        String[] bodies={
+                "A calm, premium space to think, create, learn and solve — without a noisy interface.",
+                "Chat naturally, bring in files, use your voice and keep your workspace organized.",
+                "Connect the model infrastructure you choose and keep your conversations under your control."
+        };
+        String[] mini={"THINK  •  CREATE  •  DISCOVER","CHAT  •  FILES  •  VOICE","PRIVATE  •  FLEXIBLE  •  YOURS"};
+
+        Space flex=new Space(this);
+        page.addView(flex,new LinearLayout.LayoutParams(1,0,1));
+
+        LinearLayout glassCard=col();
+        glassCard.setBackground(glass(24,46,30));
+        pad(glassCard,22,24,22,22);
+        TextView eyebrow=whiteText(mini[pageIndex],11,true);eyebrow.setAlpha(.78f);glassCard.addView(eyebrow);
+        addGap(glassCard,13);
+        TextView title=whiteText(titles[pageIndex],30,true);title.setLineSpacing(0,1.05f);glassCard.addView(title);
+        addGap(glassCard,12);
+        TextView body=whiteText(bodies[pageIndex],15,false);body.setAlpha(.82f);body.setLineSpacing(0,1.15f);glassCard.addView(body);
+        page.addView(glassCard,new LinearLayout.LayoutParams(-1,dp(238)));
+
+        addGap(page,24);
+        LinearLayout dots=row();dots.setGravity(Gravity.CENTER);
+        for(int i=0;i<3;i++){
+            View dot=new View(this);
+            dot.setBackground(bg(i==pageIndex?Color.WHITE:Color.argb(70,255,255,255),8));
+            LinearLayout.LayoutParams dl=new LinearLayout.LayoutParams(dp(i==pageIndex?28:8),dp(8));
+            dl.setMargins(dp(4),0,dp(4),0);dots.addView(dot,dl);
+        }
+        page.addView(dots,new LinearLayout.LayoutParams(-1,dp(20)));
+
+        addGap(page,16);
+        Button next=btn(pageIndex==2?"Enter NOTVISIBLEAI":"Continue",true);
+        next.setTextSize(15);
+        next.setBackground(bg(Color.WHITE,18));
+        next.setTextColor(Color.rgb(8,15,30));
+        next.setOnClickListener(v->{
+            if(pageIndex<2) showOnboarding(pageIndex+1);
+            else {prefs.edit().putBoolean("intro_complete",true).apply();showAuth(false);}
+        });
+        page.addView(next,new LinearLayout.LayoutParams(-1,dp(56)));
+        Button skip=btn("Skip intro",false);
+        skip.setTextColor(Color.WHITE);skip.setBackground(glass(18,35,18));
+        skip.setOnClickListener(v->{prefs.edit().putBoolean("intro_complete",true).apply();showAuth(false);});
+        page.addView(skip,new LinearLayout.LayoutParams(-1,dp(48)));
+
+        setContentView(page);
+    }
+
+    private boolean authSignup=false;
+    private void showAuth(boolean signup){
+        authSignup=signup;
+        LinearLayout page=premiumPage();
+        ScrollView sv=new ScrollView(this);
+        LinearLayout box=col();pad(box,4,16,4,24);
+
+        LinearLayout header=row();
+        TextView mark=brandMark();
+        header.addView(mark,new LinearLayout.LayoutParams(dp(58),dp(58)));
+        LinearLayout ht=col();pad(ht,14,0,0,0);
+        ht.addView(whiteText("NOTVISIBLEAI",20,true));
+        TextView small=whiteText("A quieter place for intelligence.",12,false);small.setAlpha(.70f);ht.addView(small);
+        header.addView(ht,new LinearLayout.LayoutParams(0,dp(62),1));
+        box.addView(header);
+
+        addGap(box,34);
+        TextView title=whiteText(signup?"Create your account":"Welcome back",30,true);box.addView(title);
+        addGap(box,7);
+        TextView sub=whiteText(signup?"Start your private AI workspace.":"Sign in to continue to your AI workspace.",14,false);sub.setAlpha(.72f);box.addView(sub);
+        addGap(box,22);
+
+        LinearLayout card=col();card.setBackground(glass(24,45,28));pad(card,18,18,18,18);
+        EditText name=null;
+        if(signup){
+            name=authField("Full name","Your name");
+            card.addView(name,new LinearLayout.LayoutParams(-1,dp(54)));addGap(card,10);
+        }
+        EditText email=authField("Email","you@example.com");card.addView(email,new LinearLayout.LayoutParams(-1,dp(54)));addGap(card,10);
+        EditText pass=authField("Password",signup?"Create a password":"Your password");
+        pass.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        card.addView(pass,new LinearLayout.LayoutParams(-1,dp(54)));addGap(card,14);
+
+        Button submit=btn(signup?"Create account":"Sign in",true);
+        submit.setTextSize(15);submit.setBackground(bg(Color.WHITE,16));submit.setTextColor(Color.rgb(8,15,30));
+        EditText finalName=name;
+        submit.setOnClickListener(v->{
+            String em=email.getText().toString().trim().toLowerCase(Locale.US);
+            String pw=pass.getText().toString();
+            if(!em.contains("@")||em.length()<5){email.setError("Enter a valid email");return;}
+            if(pw.length()<6){pass.setError("Use at least 6 characters");return;}
+            if(authSignup){
+                String n=finalName==null?"":finalName.getText().toString().trim();
+                if(n.isEmpty()){finalName.setError("Enter your name");return;}
+                byte[] salt=new byte[16];new SecureRandom().nextBytes(salt);
+                prefs.edit().putString("auth_email",em).putString("auth_name",n)
+                        .putString("auth_salt",hex(salt)).putString("auth_hash",hashPassword(pw,salt))
+                        .putBoolean("auth",true).apply();
+                enterApp();
+            }else{
+                String stored=prefs.getString("auth_email","");
+                String saltHex=prefs.getString("auth_salt","");
+                String hash=prefs.getString("auth_hash","");
+                if(stored.isEmpty()||!stored.equals(em)||saltHex.isEmpty()||!hash.equals(hashPassword(pw,fromHex(saltHex)))){
+                    statusToast("Email or password is incorrect");return;
+                }
+                prefs.edit().putBoolean("auth",true).apply();enterApp();
+            }
+        });
+        card.addView(submit,new LinearLayout.LayoutParams(-1,dp(54)));
+        box.addView(card);
+
+        addGap(box,18);
+        TextView divider=whiteText("  OR  ",11,false);divider.setGravity(Gravity.CENTER);divider.setAlpha(.55f);box.addView(divider,new LinearLayout.LayoutParams(-1,dp(28)));
+        addGap(box,6);
+        Button google=btn("Continue with Google",false);
+        google.setTextSize(14);google.setTextColor(Color.WHITE);google.setBackground(glass(18,45,18));
+        google.setOnClickListener(v->statusToast("Google sign-in will be connected to Credential Manager when the production identity backend is configured."));
+        box.addView(google,new LinearLayout.LayoutParams(-1,dp(54)));
+
+        addGap(box,18);
+        TextView toggle=whiteText(signup?"Already have an account?  Sign in":"New to NOTVISIBLEAI?  Create an account",13,false);
+        toggle.setGravity(Gravity.CENTER);toggle.setOnClickListener(v->showAuth(!authSignup));box.addView(toggle,new LinearLayout.LayoutParams(-1,dp(36)));
+        TextView privacy=whiteText("By continuing, you agree to the app's privacy and account terms.",11,false);privacy.setGravity(Gravity.CENTER);privacy.setAlpha(.55f);box.addView(privacy,new LinearLayout.LayoutParams(-1,dp(40)));
+
+        sv.addView(box);page.addView(sv,new LinearLayout.LayoutParams(-1,0,1));
+        setContentView(page);
+    }
+
+    private EditText authField(String label,String hint){
+        EditText e=new EditText(this);e.setHint(hint);e.setTextColor(Color.WHITE);e.setHintTextColor(Color.argb(145,255,255,255));
+        e.setTextSize(14);e.setSingleLine(true);e.setBackground(glass(20,38,16));e.setPadding(dp(14),0,dp(14),0);
+        e.setContentDescription(label);return e;
+    }
+
+    private String hashPassword(String password,byte[] salt){
+        try{
+            javax.crypto.SecretKeyFactory f=javax.crypto.SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            javax.crypto.spec.PBEKeySpec spec=new javax.crypto.spec.PBEKeySpec(password.toCharArray(),salt,120000,256);
+            return hex(f.generateSecret(spec).getEncoded());
+        }catch(Exception e){return "";}
+    }
+    private String hex(byte[] b){StringBuilder s=new StringBuilder();for(byte x:b)s.append(String.format(Locale.US,"%02x",x));return s.toString();}
+    private byte[] fromHex(String s){byte[] b=new byte[s.length()/2];for(int i=0;i<b.length;i++)b[i]=(byte)Integer.parseInt(s.substring(i*2,i*2+2),16);return b;}
 
     private void showWelcome(){
         screen="welcome";content.removeAllViews();bottom.setVisibility(View.GONE);pageTitle.setText("");
@@ -193,6 +407,9 @@ public class MainActivity extends Activity {
         addGap(box,18);box.addView(sectionTitle("Privacy"));addGap(box,7);
         box.addView(card("Local conversation history","Chat history, title and settings are stored in the app's local preferences.","Network requests only go to the API endpoint you configure."));
         addGap(box,18);
+        Button signout=btn("Sign out",false);
+        signout.setOnClickListener(v->{prefs.edit().putBoolean("auth",false).apply();showAuth(false);});
+        box.addView(signout,new LinearLayout.LayoutParams(-1,54));addGap(box,10);
         Button save=btn("Save settings",true);save.setOnClickListener(v->{prefs.edit().putString("base",base.getText().toString().trim().replaceAll("/$","")).putString("key",key.getText().toString().trim()).putString("model",model.getText().toString().trim()).putString("temperature",validTemp(temp.getText().toString())).putString("max_tokens",validMax(max.getText().toString())).putString("memory",mem.getText().toString()).apply();statusToast("Settings saved");});
         box.addView(save,new LinearLayout.LayoutParams(-1,54));addGap(box,12);
         Button transfer=btn("Import / Export conversations",false);transfer.setOnClickListener(v->showScreen("transfer"));box.addView(transfer,new LinearLayout.LayoutParams(-1,54));
